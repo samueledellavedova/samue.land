@@ -1,4 +1,4 @@
-FROM denoland/deno:1.31
+FROM denoland/deno:1.31.1
 WORKDIR /usr/src/samue.land
 COPY . .
 EXPOSE 443
