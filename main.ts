@@ -1,8 +1,8 @@
-const decoder = new TextDecoder("utf-8");
+const indexPage = Deno.readFileSync("index.html");
 const listener = Deno.listenTls({
   port: 443,
-  cert: decoder.decode(Deno.readFileSync("cert.pem")),
-  key: decoder.decode(Deno.readFileSync("key.pem")),
+  cert: Deno.readTextFileSync("cert.pem"),
+  key: Deno.readTextFileSync("key.pem"),
 });
 
 console.info("listening");
@@ -26,7 +26,7 @@ function handleRequest(req: Request) {
         return new Response("", {
           status: 405,
         });
-      return new Response("hi");
+      return new Response(indexPage);
     default:
       return new Response("nope", {
         status: 404,
