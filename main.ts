@@ -26,7 +26,11 @@ function handleRequest(req: Request) {
         return new Response("", {
           status: 405,
         });
-      return new Response(indexPage);
+      return new Response(indexPage, {
+        headers: {
+          "Content-Type": "text/html",
+        },
+      });
     default:
       return new Response("nope", {
         status: 404,
