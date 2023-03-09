@@ -1,3 +1,6 @@
+const fontUrl = "https://github.com/googlefonts/RobotoMono/raw/main/fonts/ttf/RobotoMono-Regular.ttf";
+const fontFileName = fontUrl.split('/').pop()!;
+const font = await ensureFontFile();
 const indexPage = Deno.readFileSync("index.html");
 const listener = Deno.listenTls({
   port: 443,
@@ -17,7 +20,22 @@ for await (const conn of listener) {
   })();
 }
 
-function handleRequest(req: Request) {
+async function ensureFontFile(): Promise<Uint8Array> {
+  try {
+    return Deno.readFileSync(fontFileName);
+  } catch (err) {
+    if (!(err instanceof Deno.errors.NotFound)) throw err;
+  }
+
+  const res = await fetch(fontUrl);
+  const buf = (await res.arrayBuffer()) as Uint8Array;
+
+  Deno.writeFileSync(fontFileName, buf);
+
+  return buf;
+}
+
+function handleRequest(req: Request): Response {
   const url = new URL(req.url);
 
   switch (url.pathname) {
@@ -29,6 +47,16 @@ function handleRequest(req: Request) {
       return new Response(indexPage, {
         headers: {
           "Content-Type": "text/html",
+        },
+      });
+    case `/static/fonts/${fontFileName}`:
+      if (req.method !== "GET")
+        return new Response("", {
+          status: 405,
+        });
+      return new Response(font, {
+        headers: {
+          "Content-Type": "font/ttf",
         },
       });
     default:
