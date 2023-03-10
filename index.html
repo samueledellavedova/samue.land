@@ -3,48 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/static/styles/index.css">
     <title>[samue.land]</title>
-    <style>
-      @font-face {
-        font-family: "Roboto Mono";
-        src: url("/static/fonts/RobotoMono-Regular.ttf");
-      }
-
-      body {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        margin: 0;
-        background: #111111;
-        color: #EEEEEE;
-        font-family: "Roboto Mono";
-      }
-
-      #me {
-        margin: 0 0 0.625rem;
-      }
-
-      #links {
-        display: flex;
-        gap: 0.75rem;
-      }
-
-      .link {
-        color: currentColor;
-        transition: color 0.25s ease-out;
-      }
-
-      .link:hover, .link:active {
-        color: #DC3545;
-      }
-
-      .icon {
-        width: 1.5rem;
-        height: 1.5rem;
-      }
-    </style>
   </head>
   <body>
     <h3 id="me">[]</h3>
@@ -70,27 +30,6 @@
       </a>
     </div>
 
-    <script type="module">
-      const me = document.getElementById("me");
-      const text = "Samuele Della Vedova";
-
-      function rand(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
-
-      function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
-
-      async function type(i = 0) {
-        if (i < text.length) {
-          await sleep(rand(69, 100));
-          me.innerHTML = me.innerHTML.slice(0, 1) + text.slice(0, ++i) + me.innerHTML.slice(-1);
-          await type(i);
-        }
-      }
-
-      await type();
-    </script>
+    <script type="module" src="/static/scripts/index.js"></script>
   </body>
 </html>

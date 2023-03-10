@@ -2,6 +2,8 @@ const fontUrl = "https://github.com/googlefonts/RobotoMono/raw/main/fonts/ttf/Ro
 const fontFileName = fontUrl.split('/').pop()!;
 const font = await ensureFontFile();
 const indexPage = Deno.readFileSync("index.html");
+const indexScript = Deno.readFileSync("static/scripts/index.js");
+const indexStyle = Deno.readFileSync("static/styles/index.css");
 const listener = Deno.listenTls({
   port: 443,
   cert: Deno.readTextFileSync("cert.pem"),
@@ -21,8 +23,10 @@ for await (const conn of listener) {
 }
 
 async function ensureFontFile(): Promise<Uint8Array> {
+  const path = "static/fonts/" + fontFileName;
+
   try {
-    return Deno.readFileSync(fontFileName);
+    return Deno.readFileSync(path);
   } catch (err) {
     if (!(err instanceof Deno.errors.NotFound)) throw err;
   }
@@ -30,9 +34,15 @@ async function ensureFontFile(): Promise<Uint8Array> {
   const res = await fetch(fontUrl);
   const buf = (await res.arrayBuffer()) as Uint8Array;
 
-  Deno.writeFileSync(fontFileName, buf);
+  Deno.writeFileSync(path, buf);
 
   return buf;
+}
+
+function methodNotAllowed(): Response {
+  return new Response("", {
+    status: 405,
+  });
 }
 
 function handleRequest(req: Request): Response {
@@ -41,22 +51,38 @@ function handleRequest(req: Request): Response {
   switch (url.pathname) {
     case "/":
       if (req.method !== "GET")
-        return new Response("", {
-          status: 405,
-        });
+        return methodNotAllowed();
+
       return new Response(indexPage, {
         headers: {
-          "Content-Type": "text/html",
+          "Content-Type": "text/html; charset=utf-8",
         },
       });
     case `/static/fonts/${fontFileName}`:
       if (req.method !== "GET")
-        return new Response("", {
-          status: 405,
-        });
+        return methodNotAllowed();
+
       return new Response(font, {
         headers: {
           "Content-Type": "font/ttf",
+        },
+      });
+    case "/static/scripts/index.js":
+      if (req.method !== "GET")
+        return methodNotAllowed();
+
+      return new Response(indexScript, {
+        headers: {
+          "Content-Type": "application/javascript; charset=utf-8",
+        },
+      });
+    case "/static/styles/index.css":
+      if (req.method !== "GET")
+        return methodNotAllowed();
+
+      return new Response(indexStyle, {
+        headers: {
+          "Content-Type": "text/css; charset=utf-8",
         },
       });
     default:
